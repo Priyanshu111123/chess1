@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #blackTimer{
+            background-color: rgb(0, 255, 68);
+        }#whiteTimer{
+            background-color: rgb(0, 255, 34);
+        }
+        .menu{
+            display:none;
+            background-color:rgb(0, 255, 0);
+            box-shadow: 0px 7px 8px 0px rgb(164, 164, 164);
+            max-width: 100px;
+            z-index: 1;
+        } .text {
+    position:absolute;
+  }
+        #tb{
+            margin-top:0px;
+            margin-left: 200px;
+            font-size: 50px;
+            border-collapse: collapse;
+            height:100px;
+        .g{
+            background-color: rgba(6, 190, 6,1);
+        }
+        .w{
+            background-color: white;
+        }
+        }
+        th,td{
+            border:1px solid ;
+            height: 70px;
+            width:70px;
+        }
+    </style>
+</head>
+<body>
+    <Button class="button" no-validate onclick="show()">&#9776;</Button>
+    <div class="menu" >
+        <p>Home</p><hr>
+        <p>Play</p><hr>
+        <p>Watch</p><hr>
+        <p>Archive</p><hr>
+    </div>
+    <label id="blackTimer"></label>
+    <table th,td id="tb">
+        <tr >
+            <th id="a8" class="g">&#9820;</th>
+            <th id="b8" class="w">&#9822;</th>
+            <th id="c8" class="g">&#9821;</th>
+            <th id="d8" class="w">&#9819;</th>
+            <th id="e8" class="g">&#9818;</th>
+            <th id="f8" class="w">&#9821;</th>
+            <th id="g8" class="g">&#9822;</th>
+            <th id="h8" class="w">&#9820;</th>
+        </tr>
+        <tr >
+            <th id="a7" class="w">&#9823;</th>
+            <th id="b7" class="g">&#9823;</th>
+            <th id="c7" class="w">&#9823;</th>
+            <th id="d7" class="g">&#9823;</th>
+            <th id="e7" class="w">&#9823;</th>
+            <th id="f7" class="g">&#9823;</th>
+            <th id="g7" class="w">&#9823;</th>
+            <th id="h7" class="g">&#9823;</th>
+        </tr>
+        <tr >
+            <th id="a6" class="g"></th>
+            <th id="b6" class="w"></th>
+            <th id="c6" class="g"></th>
+            <th id="d6" class="w"></th>
+            <th id="e6" class="g"></th>
+            <th id="f6" class="w"></th>
+            <th id="g6" class="g"></th>
+            <th id="h6" class="w"></th>
+        </tr>
+        <tr >
+            <th id="a5" class="w"></th>
+            <th id="b5" class="g"></th>
+            <th id="c5" class="w"></th>
+            <th id="d5" class="g"></th>
+            <th id="e5" class="w"></th>
+            <th id="f5" class="g"></th>
+            <th id="g5" class="w"></th>
+            <th id="h5" class="g"></th>
+        </tr>
+        <tr >
+            <th id="a4" class="g"></th>
+            <th id="b4" class="w"></th>
+            <th id="c4" class="g"></th>
+            <th id="d4" class="w"></th>
+            <th id="e4" class="g"></th>
+            <th id="f4" class="w"></th>
+            <th id="g4" class="g"></th>
+            <th id="h4" class="w"></th>
+        </tr>
+        <tr >
+            <th id="a3" class="w"></th>
+            <th id="b3" class="g"></th>
+            <th id="c3" class="w"></th>
+            <th id="d3" class="g"></th>
+            <th id="e3" class="w"></th>
+            <th id="f3" class="g"></th>
+            <th id="g3" class="w"></th>
+            <th id="h3" class="g"></th>
+        </tr>
+        <tr >
+            <th id="a2" class="g">&#9817;</th>
+            <th id="b2" class="w">&#9817;</th>
+            <th id="c2" class="g">&#9817;</th>
+            <th id="d2" class="w">&#9817;</th>
+            <th id="e2" class="g">&#9817;</th>
+            <th id="f2" class="w">&#9817;</th>
+            <th id="g2" class="g">&#9817;</th>
+            <th id="h2" class="w">&#9817;</th>
+        </tr>
+        <tr >
+            <th id="a1" class="w">&#9814;</th>
+            <th id="b1" class="g">&#9816;</th>
+            <th id="c1" class="w">&#9815;</th>
+            <th id="d1" class="g">&#9813;</th>
+            <th id="e1" class="w">&#9812;</th>
+            <th id="f1" class="g">&#9815;</th>
+            <th id="g1" class="w">&#9816;</th>
+            <th id="h1" class="g">&#9814;</th>
+        </tr>
+                </table>
+                <label id="whiteTimer" ></label>
+                <button id="p" no-validate onclick="startWhiteTimer()" style="margin-left: 500px; background-color: greenyellow;size:400px">Play</button>
+    
+                <!-- <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script> -->
+    <script>
+        const socket = io("http://localhost:5001");
+        socket.on("connect", () => {
+    console.log("✅ Connected to server:", socket.id);
+});
+
+// Ensure `ch` is received in `connectSuccess`
+
+        var a=0;
+        var pos=[];
+        for(var i=0;i<8;i++){
+            pos[i]=[];
+        }
+        for(var i=0;i<8;i++){
+            for(var j=0;j<8;j++){
+                pos[i][j]="";
+            }
+        }
+        pos[0][0]="wr";
+        pos[0][1]="wn";
+        pos[0][2]="wb";
+        pos[0][3]="wq";
+        pos[0][4]="wk";
+        pos[0][5]="wb";
+        pos[0][6]="wn";
+        pos[0][7]="wr";
+        pos[1][0]="wp";
+        pos[1][1]="wp";
+        pos[1][2]="wp";
+        pos[1][3]="wp";
+        pos[1][4]="wp";
+        pos[1][5]="wp";
+        pos[1][6]="wp";
+        pos[1][7]="wp";
+        pos[7][0]="br";
+        pos[7][1]="bn";
+        pos[7][2]="bb";
+        pos[7][3]="bq";
+        pos[7][4]="bk";
+        pos[7][5]="bb";
+        pos[7][6]="bn";
+        pos[7][7]="br";
+        pos[6][0]="bp";
+        pos[6][1]="bp";
+        pos[6][2]="bp";
+        pos[6][3]="bp";
+        pos[6][4]="bp";
+        pos[6][5]="bp";
+        pos[6][6]="bp";
+        pos[6][7]="bp";
+        let blackTimer, whiteTimer;
+let blackTime = 300; 
+let whiteTime = 300; 
+let turn = 0; 
+function updateTimeLabels(blackTime, whiteTime) {
+    document.getElementById("blackTimer").innerText = "Black's Time: " + blackTime + "s";
+    document.getElementById("whiteTimer").innerText = "White's Time: " + whiteTime + "s";
+}
+
+function startBlackTimer() {
+    clearInterval(whiteTimer);
+    blackTimer = setInterval(() => {
+        blackTime--;
+        updateTimeLabels(blackTime, whiteTime); 
+        if (blackTime <= 0) {
+            clearInterval(blackTimer);
+            console.log("Black's time is up!");
+        }
+    }, 1000);
+}
+
+function startWhiteTimer() {
+    clearInterval(blackTimer); 
+    whiteTimer = setInterval(() => {
+        whiteTime--; 
+        updateTimeLabels(blackTime, whiteTime);
+        if (whiteTime <= 0) {
+            clearInterval(whiteTimer);
+            console.log("White's time is up!");
+        }
+    }, 1000);
+}
+       function show(){
+        if(a==0){
+        document.getElementsByClassName("menu")[0].style.cssText="display:block;";
+        document.getElementById("tb").style.cssText="margin-top:-216px";
+        a=1;
+        }else{
+        document.getElementsByClassName("menu")[0].style.cssText="display:none;";
+        document.getElementById("tb").style.cssText="margin-top:0px";
+        a=0;
+        }
+       }
+       var arr=[];
+       
+    wt=1;
+    ch=-1;
+    socket.on("connectSuccess", (data) => {
+        ch=data.ch;
+
+wt=ch;
+    console.log("🔹 Received `ch` in connectSuccess:", data.ch);
+});
+socket.on("receiveMessage", (sc) => {
+if(sc==ch){
+wt=ch;
+if(ch==1)
+startWhiteTimer();
+else
+startBlackTimer();
+}
+else if(ch==0)
+startWhiteTimer();
+else
+startBlackTimer();
+});
+socket.on("rm",(data)=>{
+                    pos[data.substring(4,6).charCodeAt(1)-49][data.substring(4,6).charCodeAt(0)-97]=data.substring(0,2);//pos is a 2d array showing the position on the board
+                    pos[data.substring(2,4).charCodeAt(1)-49][data.substring(2,4).charCodeAt(0)-97]="";
+    document.getElementById(data.substring(2,4)).innerHTML="";
+    document.getElementById(data.substring(4,6)).innerHTML=data.substring(6);
+    
+});
+       function legalMoves(s,x,y){
+        if(s=="wp"&&wt==1){
+            var ar=[];
+            if(pos[y+1][x]=="")
+            ar.push([x,y+1]);
+            if(x+1<8&&y+1<8&&pos[y+1][x+1][0]=='b')
+            ar.push([x+1,y+1]);
+            if(y+1<8&&x-1>0&&pos[y+1][x-1][0]=='b')
+            ar.push([x-1,y+1]);
+            if(y==1)
+            ar.push([x,y+2]);
+            return ar;
+        }
+        if( s=="wk"&&wt==1){
+            var ar=[];
+            //if(pos[])
+            if(y+1<8&&pos[y+1][x]=="")
+            ar.push([x,y+1]);
+            if(y+1<8&&x+1<8&&pos[y+1][x+1]=="")
+            ar.push([x+1,y+1]);
+            if(y-1>=0&&pos[y-1][x]=="")
+            ar.push([x,y-1]);
+            if(y-1>=0&&x-1>=0&&pos[y-1][x-1]=="")
+            ar.push([x-1,y-1]);
+            if(y+1<8&&x-1>=0&&pos[y+1][x-1]=="")
+            ar.push([x-1,y+1]);
+            if(y-1>=0&&x+1<8&&pos[y-1][x+1]=="")
+            ar.push([x+1,y-1]);
+            if(x+1<8&&pos[y][x+1]=="")
+            ar.push([x+1,y]);
+            if(x-1>=0&&pos[y][x-1]=="")
+            ar.push([x-1,y]);
+        return ar;
+        }
+        if(s=="wb"&&wt==1){
+            var ar=[];
+            for(var i=1;i<8&&x+i<8&&y+i<8;i++){
+                if(pos[y+i][x+i]=="")
+                ar.push([x+i,y+i]);
+            else{
+                if(pos[y+i][x+i][0]=='b'){
+                    ar.push([x+i,y+i]);
+                }
+            break;
+            }
+            }
+            for(var i=1;i<8&&x-i>=0&&y-i>=0;i++){
+                if(pos[y-i][x-i]=="")
+                ar.push([x-i,y-i]);
+            else{
+                if(pos[y-i][x-i][0]=='b'){
+                    ar.push([x-i,y-i]);
+                }
+            break;
+            }
+            }
+            for(var i=1;i<8&&x+i<8&&y-i>=0;i++){
+                if(pos[y-i][x+i]=="")
+                ar.push([x+i,y-i]);
+            else{
+                if(pos[y-i][x+i][0]=='b'){
+                    ar.push([x+i,y-i]);
+                }
+            break;
+            }
+            }
+            for(var i=1;(i<8)&&(x-i>=0)&&(y+i<8);i++){
+                if(pos[y+i][x-i]=="")
+                ar.push([x-i,y+i]);
+            else{
+                if(pos[y+i][x-i][0]=='b'){
+                    ar.push([x-i,y+i]);
+                }
+            break;
+            }
+            }
+            
+            return ar;
+        }
+        if(s=="wq"&&wt==1){
+            var ar=[];
+            for(var i=1;i<8&&x+i<8&&y+i<8;i++){
+                if(pos[y+i][x+i]=="")
+                ar.push([x+i,y+i]);
+            else{
+                if(pos[y+i][x+i][0]=='b'){
+                ar.push([x+i,y+i]);
+                }
+            break;
+            }
+            }
+            for(var i=1;i<8&&x-i>=0&&y-i>=0;i++){
+                if(pos[y-i][x-i]=="")
+                ar.push([x-i,y-i]);
+            else{
+                if(pos[y-i][x-i][0]=='b'){
+                ar.push([x-i,y-i]);
+                }
+            break;
+            }
+            }
+            for(var i=1;i<8&&x+i<8&&y-i>0;i++){
+                if(pos[y-i][x+i]=="")
+                ar.push([x+i,y-i]);
+            else{
+                if(pos[y-i][x+i][0]=='b'){
+                ar.push([x+i,y-i]);
+                }
+            break;
+            }
+            }
+            for(var i=1;i<8&&x-i>=0&&y+i<8;i++){
+                if(pos[y+i][x-i]=="")
+                ar.push([x-i,y+i]);
+            else{
+                if(pos[y+i][x-i][0]=='b'){
+                    ar.push([x-i,y+i]);
+                }
+            break;
+            }
+            }
+            
+            for(var i=x+1;i<8;i++){
+                if(pos[y][i]=="")
+                ar.push([i,y]);
+            else{
+                if(pos[y][i][0]=='b'){
+                ar.push([i,y]);
+                }
+            break;
+            }
+            }
+            for(var i=x-1;i>=0;i--){
+                if(pos[y][i]=="")
+                ar.push([i,y]);
+            else{
+                if(pos[y][i][0]=='b'){
+                ar.push([i,y]);
+                }
+            break;
+            }
+            }
+            for(var i=y+1;i<8;i++){
+                if(pos[i][x]=="")
+                ar.push([x,i]);
+            else{
+                if(pos[i][x][0]=='b'){
+                ar.push([x,i]);
+                }
+            break;
+            }
+            }
+            for(var i=y-1;i>=0;i--){
+                if(pos[i][x]=="")
+                ar.push([x,i]);
+            else{
+                if(pos[i][x][0]=='b'){
+                ar.push([x,i]);
+                console.log("ty");
+                }
+            break;
+            }
+            }
+            return ar;
+        }
+        if(s=="wn"&&wt==1){
+            var ar=[];
+            if(y+1<8&&x+2<8&&(pos[y+1][x+2]==""||pos[y+1][x+2][0]=="b"))
+            ar.push([x+2,y+1]);
+            if(y+1<8&&x-2>=0&&(pos[y+1][x-2]==""||pos[y+1][x-2][0]=="b"))
+            ar.push([x-2,y+1]);
+            if(y+2<8&&x+1<8&&(pos[y+2][x+1]==""||pos[y+2][x+1][0]=="b"))
+            ar.push([x+1,y+2]);
+            if(y+2<8&&x-1>=0&&(pos[y+2][x-1]==""||pos[y+2][x-1][0]=="b"))
+            ar.push([x-1,y+2]);
+            if(y-1>=0&&x-2>=0&&(pos[y-1][x-2]==""||pos[y-1][x-2][0]=="b"))
+            ar.push([x-2,y-1]);
+            if(y-1>=0&&x+2<8&&(pos[y-1][x+2]==""||pos[y-1][x+2][0]=="b"))
+            ar.push([x+2,y-1]);
+            if(y-2>=0&&x+1<8&&(pos[y-2][x+1]==""||pos[y-2][x+1][0]=="b"))
+            ar.push([x+1,y-2]);
+            if(y-2>=0&&x-1>=0&&(pos[y-2][x-1]==""||pos[y-2][x-1][0]=="b"))
+            ar.push([x-1,y-2]);
+        return ar;
+        }
+        var t=0;
+        if(s=="wr"&&wt==1){
+            var ar=[];
+            for(var i=x+1;i<8;i++){
+                if(pos[y][i]=="")
+                ar.push([i,y]);
+            else{
+                if(pos[y][i][0]=='b')
+                ar.push([i,y]);
+            break;
+            }
+            }
+            for(var i=x-1;i>=0;i--){
+                if(pos[y][i]=="")
+                ar.push([i,y]);
+            else{
+                if(pos[y][i][0]=='b')
+                ar.push([i,y]);
+            break;
+            }
+            }
+            for(var i=y+1;i<8;i++){
+                if(pos[i][x]=="")
+                ar.push([x,i]);
+            else{
+                if(pos[i][x][0]=='b')
+                ar.push([x,i]);
+            break;
+            }
+            }
+            for(var i=y-1;i>=0;i--){
+                if(pos[i][x]=="")
+                ar.push([x,i]);
+            else{
+                if(pos[i][x][0]=='b')
+                ar.push([x,i]);
+            break;
+            }
+            }
+            return ar;
+        }
+        if(s=="bp"&&wt==0){
+            var ar=[];
+            if(pos[y-1][x]=="")
+            ar.push([x,y-1]);
+            if(pos[y-1][x+1][0]=='w')
+            ar.push([x+1,y-1]);
+            if(x>0&&pos[y-1][x-1][0]=='w')
+            ar.push([x-1,y-1]);
+            if(y==6)
+            ar.push([x,y-2]);
+            return ar;
+        }
+        if( s=="bk"&&wt==0){
+            var ar=[];
+            if(y+1<8&&(pos[y+1][x]==""||pos[y+1][x][0]=="w"))
+            ar.push([x,y+1]);
+            if(y+1<8&&x+1<8&&(pos[y+1][x+1]==""))
+            ar.push([x+1,y+1]);
+            if(y-1>=0&&(pos[y-1][x]==""))
+            ar.push([x,y-1]);
+            if(y-1>=0&&x-1>=0&&(pos[y-1][x-1]==""))
+            ar.push([x-1,y-1]);
+            if(y+1<8&&x-1>=0&&(pos[y+1][x-1]==""))
+            ar.push([x-1,y+1]);
+            if(y-1>=0&&x+1<8&&(pos[y-1][x+1]==""))
+            ar.push([x+1,y-1]);
+            if(x+1<8&&(pos[y][x+1]==""))
+            ar.push([x+1,y]);
+            if(x-1>=0&&(pos[y][x-1]==""))
+            ar.push([x-1,y]);
+        return ar;
+        }
+        if(s=="bb"&&wt==0){
+            var ar=[];
+            for(var i=1;i<8&&x+i<8&&y+i<8;i++){
+                if(pos[y+i][x+i]=="")
+                ar.push([x+i,y+i]);
+            else{
+                if(pos[y+i][x+i][0]=="w")
+                ar.push([x+i,y+i]);
+            break;
+            }
+            }
+            for(var i=1;i<8&&x-i>=0&&y-i>=0;i++){
+                if(pos[y-i][x-i]=="")
+                ar.push([x-i,y-i]);
+                else{
+                if(pos[y-i][x-i][0]=="w")
+                ar.push([x-i,y-i]);
+                break;
+                }
+            }
+            for(var i=1;i<8&&x+i<8&&y-i>=0;i++){
+                if(pos[y-i][x+i]=="")
+                ar.push([x+i,y-i]);
+                else{
+                if(pos[y-i][x+i][0]=="w")
+                ar.push([x+i,y-i]);
+                break;
+                }
+            }
+            for(var i=1;(i<8)&&(x-i>=0)&&(y+i<8);i++){
+                if(pos[y+i][x-i]=="")
+                ar.push([x-i,y+i]);
+                else{
+                if(pos[y+i][x-i]=="")
+                ar.push([x-i,y+i]);
+                break;
+                }
+            }
+            
+            return ar;
+        }
+        if(s=="bq"&&wt==0){
+            var ar=[];
+            for(var i=1;i<8&&x+i<8&&y+i<8;i++){
+                if(pos[y+i][x+i]=="")
+                ar.push([x+i,y+i]);
+            else{
+                if(pos[y+i][x+i][0]=="w")
+                ar.push([x+i,y+i]);
+            break;
+            }
+            }
+            for(var i=1;i<8&&x-i>=0&&y-i>=0;i++){
+                if(pos[y-i][x-i]=="")
+                ar.push([x-i,y-i]);
+                else{
+                if(pos[y-i][x-i][0]=="w")
+                ar.push([x-i,y-i]);
+                break;
+                }
+            }
+            for(var i=1;i<8&&x+i<8&&y-i>0;i++){
+                if(pos[y-i][x+i]=="")
+                ar.push([x+i,y-i]);
+                else{
+                if(pos[y-i][x+i][0]=="w")
+                ar.push([x+i,y-i]);
+                break;
+                }
+            }
+            for(var i=1;i<8&&x-i>=0&&y+i<8;i++){
+                if(pos[y+i][x-i]=="")
+                ar.push([x-i,y+i]);
+                else{
+                if(pos[y+i][x-i][0]=="w")
+                ar.push([x-i,y+i]);
+                break;
+                }
+            }
+            
+            for(var i=x+1;i<8;i++){
+                if(pos[y][i]=="")
+                ar.push([i,y]);
+                else{
+                if(pos[y][i][0]=="w")
+                ar.push([i,y]);
+                break;
+                }
+            }
+            for(var i=x-1;i>=0;i--){
+                if(pos[y][i]=="")
+                ar.push([i,y]);
+                else{
+                if(pos[y][i][0]=="w")
+                ar.push([i,y]);
+                break;
+                }
+            }
+            for(var i=y+1;i<8;i++){
+                if(pos[i][x]=="")
+                ar.push([x,i]);
+                else{
+                if(pos[i][x][0]=="w")
+                ar.push([x,i]);
+                break;
+                }
+            }
+            for(var i=y-1;i>=0;i--){
+                if(pos[i][x]=="")
+                ar.push([x,i]);
+                else{
+                if(pos[i][x][0]=="w")
+                ar.push([x,i]);
+                break;
+                }
+            }
+            return ar;
+        }
+        if(s=="bn"&&wt==0){
+            var ar=[];
+            if(y+1<8&&x+2<8&&(pos[y+1][x+2]==""||pos[y+1][x+2][0]=="w"))
+            ar.push([x+2,y+1]);
+            if(y+1<8&&x-2>=0&&(pos[y+1][x-2]==""||pos[y+1][x-2][0]=="w"))
+            ar.push([x-2,y+1]);
+            if(y+2<8&&x+1<8&&(pos[y+2][x+1]==""||pos[y+2][x+1][0]=="w"))
+            ar.push([x+1,y+2]);
+            if(y+2<8&&x-1>=0&&(pos[y+2][x-1]==""||pos[y+2][x-1][0]=="w"))
+            ar.push([x-1,y+2]);
+            if(y-1>=0&&x-2>=0&&(pos[y-1][x-2]==""||pos[y-1][x-2][0]=="w"))
+            ar.push([x-2,y-1]);
+            if(y-1>=0&&x+2<8&&(pos[y-1][x+2]==""||pos[y-1][x+2][0]=="w"))
+            ar.push([x+2,y-1]);
+            if(y-2>=0&&x+1<8&&(pos[y-2][x+1]==""||pos[y-2][x+1][0]=="w"))
+            ar.push([x+1,y-2]);
+            if(y-2>=0&&x-1>=0&&(pos[y-2][x-1]==""||pos[y-2][x-1][0]=="w"))
+            ar.push([x-1,y-2]);
+        return ar;
+        }
+        var t=0;
+        if(s=="br"&&wt==0){
+            var ar=[];
+            for(var i=x+1;i<8;i++){
+                if(pos[y][i]=="")
+                ar.push([i,y]);
+                else{
+                if(pos[y][i][0]=="w")
+                ar.push([i,y]);
+                break;
+                }
+            }
+            for(var i=x-1;i>=0;i--){
+                if(pos[y][i]=="")
+                ar.push([i,y]);
+                else{
+                if(pos[y][i][0]=="w")
+                ar.push([i,y]);
+                break;
+            }
+            }
+            for(var i=y+1;i<8;i++){
+                if(pos[i][x]=="")
+                ar.push([x,i]);
+                else{
+                if(pos[i][x][0]=="w")
+                ar.push([x,i]);
+                break;
+                }
+            }
+            for(var i=y-1;i>=0;i--){
+                if(pos[i][x]=="")
+                ar.push([x,i]);
+                else{
+                if(pos[i][x][0]=="w")
+                ar.push([x,i]);
+                break;
+                }
+            }
+            return ar;
+        }
+    }
+    var k=1;// It is 0 if a peice is clicked
+    var d=0;
+    var nl=[];//array containing the legal moves
+    var ps="";//is assigned the id of the peice clicked previously
+        var sc="";
+        var lg=[];
+        
+        
+       
+    
+       window.onclick=function(e){
+       var i,j;
+       
+        if(k==0){
+            k=1;
+        if(nl&&nl.length!=0){
+            for(var i=0;i<nl.length;i++){
+                if(e.target.id.charCodeAt(0)-97==nl[i][0]&&e.target.id.charCodeAt(1)-49==nl[i][1]){
+                    var cd="";//peice
+                    if(sc=="wr"){
+                    cd="♖";
+                    console.log("rook");
+                    }
+                    if(sc=="wb")
+                    cd="♗";
+                    if(sc=="wn")
+                    cd="♘";
+                    if(sc=="wq")
+                    cd="♕";
+                    if(sc=="wk")
+                    cd="♔";
+                    if(sc=="wp")
+                    cd="♙";
+                    if(sc=="br")
+                    cd="♜";
+                    if(sc=="bb")
+                    cd="♝;";
+                    if(sc=="bn")
+                    cd="♞";
+                    if(sc=="bq")
+                    cd="♛";
+                    if(sc=="bk")
+                    cd="♚";
+                    if(sc=="bp")
+                    cd="♟";
+                    pos[nl[i][1]][nl[i][0]]=sc;//pos is a 2d array showing the position on the board
+                    pos[ps.charCodeAt(1)-49][ps.charCodeAt(0)-97]="";
+                document.getElementById(String.fromCharCode(97+parseInt(nl[i][0]))+""+String.fromCharCode(49+parseInt(nl[i][1]))).style.cssText="color:rgba(0,0,0,1);";
+                console.log(String.fromCharCode(97+parseInt(nl[i][0]))+""+String.fromCharCode(49+parseInt(nl[i][1])));  
+                console.log(cd);
+                
+                    
+                
+                    var text2 = document.getElementById('a2').querySelector('.text.text1');
+                    if(text2)
+                    document.getElementById('a2').removeChild(text2);
+                    document.getElementById(ps).innerHTML="";
+                   for(var j=0;j<nl.length;j++){
+            if(j==i)
+            continue;
+        if(document.getElementById(String.fromCharCode(97+parseInt(nl[j][0]))+""+String.fromCharCode(49+parseInt(nl[j][1]))).innerHTML=="•"){
+                document.getElementById(String.fromCharCode(97+parseInt(nl[j][0]))+""+String.fromCharCode(49+parseInt(nl[j][1]))).style.cssText="color:rgba(0,0,0,1);";
+            document.getElementById(String.fromCharCode(97+parseInt(nl[j][0]))+""+String.fromCharCode(49+parseInt(nl[j][1]))).innerHTML="";
+        }
+                }
+                
+                document.getElementById(String.fromCharCode(97+parseInt(nl[i][0]))+""+String.fromCharCode(49+parseInt(nl[i][1]))).innerHTML=cd;
+                wt=-1;
+                socket.emit("sm", sc+ps+String.fromCharCode(97+parseInt(nl[i][0]))+""+String.fromCharCode(49+parseInt(nl[i][1]))+cd); 
+                socket.emit("sendMessage",!ch); 
+                k=1;
+                    return;
+                }else{
+                    var text2 = document.getElementById('a2').querySelector('.text.text1');
+                    console.log(text2);
+                    if(text2)
+                    document.getElementById('a2').removeChild(text2);
+                if(document.getElementById(String.fromCharCode(97+parseInt(nl[i][0]))+""+String.fromCharCode(49+parseInt(nl[i][1]))).innerHTML=="•"){
+                document.getElementById(String.fromCharCode(97+parseInt(nl[i][0]))+""+String.fromCharCode(49+parseInt(nl[i][1]))).style.cssText="color:rgba(0,0,0,1);";
+            document.getElementById(String.fromCharCode(97+parseInt(nl[i][0]))+""+String.fromCharCode(49+parseInt(nl[i][1]))).innerHTML="";
+                }
+                }
+            }
+        }}
+         
+        if(k==1){
+            for(i=0;i<8;i++){
+            for(j=0;j<8;j++){
+                if(e.target.id.charCodeAt(0)-97==i&&e.target.id.charCodeAt(1)-49==j){
+                    sc=pos[j][i];
+                    break;
+                }
+            }
+            if(j!=8)
+            break;
+        }
+        ps=e.target.id;
+        lg=legalMoves(sc,i,j);
+        nl=lg;
+        if(lg){
+        var text1 = document.createElement('a2');
+        
+  text1.className = 'text text1';
+  document.getElementById('a2').appendChild(text1);
+        for(var i=0;i<lg.length;i++){
+            var id=String.fromCharCode(97+parseInt(lg[i][0]))+""+String.fromCharCode(49+parseInt(lg[i][1]));
+            if(document.getElementById(id).innerText==""){
+            document.getElementById(id).style.cssText="color:rgba(0,0,0,0.5);";
+            document.getElementById(id).innerHTML="•";
+            }
+        else{
+  text1.id=id;
+  text1.innerText = '•';
+var iw = document.getElementById('a2').offsetWidth;
+    var ih = document.getElementById('a2').offsetHeight;
+text1.style.cssText="color:rgba(0,0,0,0.5);";
+    text1.style.top = (ih * 0.5-70*lg[i][1]) + 'px';
+    text1.style.left = (iw * 0.5 +70*lg[i][0])+ 'px';
+  text1.style.transform = 'translate(214px, 496px)';
+        }
+        }
+    }}
+        k=0;
+    }
+
+       //}
+    
+    </script>
+
+<script>
+    
+</script> 
+</body>
+</html>
