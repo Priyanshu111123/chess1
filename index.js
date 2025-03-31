@@ -14,7 +14,7 @@ const io = new Server(server, {
 
 app.use(cors());
 app.use(express.static(__dirname + "/public")); 
-ch=0;
+ch=1;
 io.on("connection", (socket) => {
     console.log("✅ A user connected:", socket.id);
 
